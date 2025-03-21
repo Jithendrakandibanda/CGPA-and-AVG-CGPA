@@ -1,0 +1,98 @@
+import React, { useState } from "react";
+
+const GPACalculator = () => {
+  const subjects = [
+    { name: "Maths", credits: 4 },
+    { name: "Data Structures", credits: 4 },
+    { name: "DBMS", credits: 3 },
+    { name: "Digital Principles", credits: 3 },
+    { name: "Basic Electrical Engineering", credits: 3 },
+    { name: "Universal Human Values", credits: 2 },
+    { name: "Cloud Application Developer", credits: 3 },
+    { name: "Data Structures Lab", credits: 1},
+    { name: "DBMS Lab", credits: 1 },
+    { name: "Digital Principles Lab", credits: 1 },
+  ];
+
+  const [grades, setGrades] = useState(
+    subjects.reduce((acc, subject) => ({ ...acc, [subject.name]: "10.0" }), {})
+  );
+  const [gpa, setGpa] = useState(null);
+  const [preCgpa, setPreCgpa] = useState(0);
+
+  const handleChange = (e) => {
+    setGrades({ ...grades, [e.target.name]: e.target.value });
+  };
+
+  const calculateGPA = () => {
+    let totalCredits = 0;
+    let weightedSum = 0;
+    subjects.forEach(({ name, credits }) => {
+      const gradeValue = Number(grades[name]);
+      weightedSum += gradeValue * credits;
+      totalCredits += credits;
+    });
+    const gpaValue = weightedSum / totalCredits;
+    setGpa(gpaValue.toFixed(2));
+  };
+
+  const calculateAvgCGPA = () => {
+    if (gpa !== null) {
+      const avgCgpa = (parseFloat(preCgpa) + parseFloat(gpa)) / 2;
+      return avgCgpa.toFixed(2);
+    }
+    return "0.00";
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md text-white">
+        <h1 className="text-2xl font-bold text-center mb-4">🎓 GPA Calculator</h1>
+        <div className="space-y-3">
+          {subjects.map(({ name }) => (
+            <label key={name} className="block font-semibold">
+              {name}
+              <select
+                className="w-full p-2 mt-1 rounded bg-gray-800"
+                name={name}
+                value={grades[name]}
+                onChange={handleChange}
+              >
+                <option value="10.0">H</option>
+                <option value="9.0">S</option>
+                <option value="8.0">A</option>
+                <option value="7.0">B</option>
+                <option value="6.0">C</option>
+                <option value="0.0">F</option>
+              </select>
+            </label>
+          ))}
+        </div>
+        <label className="block font-semibold mt-4">
+          Previous CGPA:
+          <input
+            type="number"
+            step="0.01"
+            className="w-full p-2 mt-1 rounded bg-gray-800"
+            value={preCgpa}
+            onChange={(e) => setPreCgpa(e.target.value)}
+          />
+        </label>
+        <button
+          onClick={calculateGPA}
+          className="w-full mt-4 p-2 bg-blue-600 rounded text-white font-bold"
+        >
+          Calculate GPA
+        </button>
+        {gpa !== null && (
+          <p className="mt-4 text-center text-lg font-semibold">Your GPA is: {gpa}</p>
+        )}
+        {gpa !== null && (
+          <p className="mt-2 text-center text-lg font-semibold">Your Average CGPA is: {calculateAvgCGPA()}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default GPACalculator;
